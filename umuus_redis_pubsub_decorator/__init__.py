@@ -29,7 +29,7 @@ Installation
 Example
 -------
 
-    $ export UMUUS_REDIS_PUBSUB_DECORATOR_REDIS_CONF_FILE=/PATH/FILE.json
+    $ export UMUUS_REDIS_PUBSUB_DECORATOR=/PATH/FILE.json
 
     $ umuus_redis_pubsub_decorator
 
@@ -83,6 +83,15 @@ Example
 
 ----
 
+    @umuus_redis_pubsub_decorator.default_instance.subscribe()
+    def f(x, y):
+        print('f')
+        return x * y
+
+    umuus_redis_pubsub_decorator.default_instance.run()
+
+----
+
 Authors
 -------
 
@@ -100,6 +109,12 @@ import json
 import functools
 import logging
 logger = logging.getLogger(__name__)
+(__name__ == '__main__' and logging.basicConfig(
+    level=os.environ.get(__name__.upper().replace('.', '__') + '_LOG_LEVEL',
+                         'WARNING'),
+    stream=sys.stdout))
+logger.setLevel(
+    os.environ.get(__name__.upper().replace('.', '__') + '_LOGLEVEL', 'DEBUG'))
 import fire
 import redis
 import attr
@@ -184,8 +199,7 @@ class RedisPubSubUtil(object):
 
     def __attrs_post_init__(self):
         if not self.env:
-            self.env = os.environ.get(
-                self.name.replace('.', '__').upper() + '_REDIS_CONF_FILE')
+            self.env = os.environ.get(self.name.replace('.', '__').upper())
         if not self.instance:
             self.instance = redis.Redis(
                 **(self.config or json.load(open(self.file or self.env))))
@@ -224,6 +238,11 @@ def run(options={}):
         for module_name, function_name in [path.split(':')]
     ]
     redis_pubsub_util.run()
+
+
+default_env_name = __name__.replace('.', '__').upper()
+default_instance = (os.environ.get(default_env_name)
+                    and RedisPubSubUtil(name=__name__))
 
 
 def main(argv=[]):  # type: int

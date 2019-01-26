@@ -10,7 +10,7 @@ Installation
 Example
 -------
 
-    $ export UMUUS_REDIS_PUBSUB_DECORATOR_REDIS_CONF_FILE=/PATH/FILE.json
+    $ export UMUUS_REDIS_PUBSUB_DECORATOR=/PATH/FILE.json
 
     $ umuus_redis_pubsub_decorator
 
@@ -61,6 +61,15 @@ Example
     $ redis-cli PUBLISH '__main__.h' '{"x": 1, "y": 2}'
 
     $ redis-cli PUBLISH '__main__.g' '{"x": 1, "y": 2}'
+
+----
+
+    @umuus_redis_pubsub_decorator.default_instance.subscribe()
+    def f(x, y):
+        print('f')
+        return x * y
+
+    umuus_redis_pubsub_decorator.default_instance.run()
 
 ----
 
