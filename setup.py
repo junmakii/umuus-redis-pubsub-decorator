@@ -1,0 +1,105 @@
+
+from setuptools import setup, find_packages
+from setuptools.command.install import install
+from setuptools.command.test import test as TestCommand
+
+
+class PyTest(TestCommand):
+    def run_tests(self):
+        import sys
+        import shlex
+        import pytest
+        errno = pytest.main(['--doctest-modules'])
+        if errno != 0:
+            raise Exception('An error occured during installution.')
+        install.run(self)
+
+
+setup(
+    packages=setuptools.find_packages('.'),
+    version='0.1',
+    url='https://github.com/junmakii/umuus-redis-pubsub-decorator',
+    author='Jun Makii',
+    author_email='junmakii@gmail.com',
+    keywords=[],
+    license='GPLv3',
+    scripts=[],
+    install_requires=['redis>=3.0.1'],
+    dependency_links=[],
+    classifiers=[],
+    entry_points={},
+    project_urls={},
+    setup_requires=[],
+    test_suite='',
+    tests_require=[],
+    extras_require={},
+    package_data={},
+    python_requires='',
+    include_package_data=True,
+    zip_safe=True,
+    name='umuus-redis-pubsub-decorator',
+    description='Utilities, tools, and scripts for Python.',
+    long_description=('Utilities, tools, and scripts for Python.\n'
+ '\n'
+ 'umuus-redis-pubsub-decorator\n'
+ '============================\n'
+ '\n'
+ 'Installation\n'
+ '------------\n'
+ '\n'
+ '    $ pip install '
+ 'git+https://github.com/junmakii/umuus-redis-pubsub-decorator.git\n'
+ '\n'
+ 'Example\n'
+ '-------\n'
+ '\n'
+ '    $ export UMUUS_REDIS_PUBSUB_DECORATOR_REDIS_CONF_FILE=/PATH/FILE.json\n'
+ '\n'
+ '    $ umuus_redis_pubsub_decorator\n'
+ '\n'
+ '    >>> import umuus_redis_pubsub_decorator\n'
+ '\n'
+ '----\n'
+ '\n'
+ '    redis_pubsub_decorator = umuus_redis_pubsub_decorator.RedisPubSubUtil(\n'
+ '      name=__name__,\n'
+ "      file='tmp_redis.json'\n"
+ '    )\n'
+ '\n'
+ '    @redis_pubsub_decorator.publish()\n'
+ '    def f(x, y):\n'
+ '        return x * y\n'
+ '\n'
+ '    @redis_pubsub_decorator.subscribe()\n'
+ '    def g(x, y):\n'
+ "        print('SUBSCRIBED:g')\n"
+ '        return x * y\n'
+ '\n'
+ '    @redis_pubsub_decorator.subscribe()\n'
+ '    def h(x, y):\n'
+ "        print('SUBSCRIBED:h')\n"
+ '        return x * y\n'
+ '\n'
+ '    redis_pubsub_decorator.run()\n'
+ '\n'
+ '----\n'
+ '\n'
+ "    $ redis-cli PSUBSCRIBE '*' &\n"
+ '\n'
+ '    $ redis-cli PUBLISH \'__main__.h\' \'{"x": 1, "y": 2}\'\n'
+ '\n'
+ '    $ redis-cli PUBLISH \'__main__.g\' \'{"x": 1, "y": 2}\'\n'
+ '\n'
+ '----\n'
+ '\n'
+ 'Authors\n'
+ '-------\n'
+ '\n'
+ '- Jun Makii <junmakii@gmail.com>\n'
+ '\n'
+ 'License\n'
+ '-------\n'
+ '\n'
+ 'GPLv3 <https://www.gnu.org/licenses/>'),
+    cmdclass={"pytest": PyTest},
+)
