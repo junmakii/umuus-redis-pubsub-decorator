@@ -24,7 +24,7 @@ setup(
     keywords=[],
     license='GPLv3',
     scripts=[],
-    install_requires=['redis>=3.0.1'],
+    install_requires=['redis>=3.0.1', 'toolz>=0.9.0', 'fire>=0.1.3', 'attrs>=18.2.0'],
     dependency_links=[],
     classifiers=[],
     entry_points={},

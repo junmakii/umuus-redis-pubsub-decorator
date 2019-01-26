@@ -116,6 +116,9 @@ __license__ = 'GPLv3'
 __scripts__ = []
 __install_requires__ = [
     'redis>=3.0.1',
+    'toolz>=0.9.0',
+    'fire>=0.1.3',
+    'attrs>=18.2.0',
 ]
 __dependency_links__ = []
 __classifiers__ = []
