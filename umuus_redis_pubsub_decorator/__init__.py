@@ -158,7 +158,7 @@ class RedisPubSubListener(object):
             try:
                 message = self.parent.pubsub.get_message()
                 if message and message.get('type') == 'message':
-                    result = self.fn(**self.parent.serializer(
+                    result = self.fn(**self.parent.normalizer(
                         message.get('data').decode(self.encoding)))
                     self.parent.instance.publish(
                         self.name + ':on_completed',
@@ -176,7 +176,10 @@ class RedisPubSubUtil(object):
     config = attr.ib(None)
     instance = attr.ib(None)
     env = attr.ib(None)
-    serializer = attr.ib(lambda _: toolz.excepts(Exception, lambda _: addict.Dict(json.loads(_)), lambda err: _)(_))
+    serializer = attr.ib(
+        lambda _: toolz.excepts(Exception, lambda _: json.dumps(_), lambda err: str(_))(_)
+    )
+    normalizer = attr.ib(lambda _: toolz.excepts(Exception, lambda _: addict.Dict(json.loads(_)), lambda err: addict.Dict(message=_))(_))
     subscriptions = attr.ib([])
 
     def __attrs_post_init__(self):
