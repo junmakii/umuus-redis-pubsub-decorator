@@ -35,12 +35,27 @@ Example
 
     >>> import umuus_redis_pubsub_decorator
 
+
 ----
 
-    redis_pubsub_decorator = umuus_redis_pubsub_decorator.RedisPubSubUtil(
-      name=__name__,
-      file='tmp_redis.json'
-    )
+    $ cat CONFIG.json
+
+    {
+        "redis_pubsub_util": {
+            "config": {
+                "host": "redis",
+                "port": 6379,
+                "password": "ehu493jfqn8d"
+            }
+        },
+        "paths": ["example:foo", "example:bar"]
+    }
+
+    $ python umuus_redis_pubsub_decorator.py run --options "$(cat CONFIG.json)"
+
+----
+
+    redis_pubsub_decorator = umuus_redis_pubsub_decorator.RedisPubSubUtil(config={"host": "redis", "port": 6379})
 
     @redis_pubsub_decorator.publish()
     def f(x, y):
@@ -85,6 +100,7 @@ import json
 import functools
 import logging
 logger = logging.getLogger(__name__)
+import fire
 import redis
 import attr
 import addict
@@ -125,7 +141,7 @@ class RedisPubSubListener(object):
     fn = attr.ib(None)
     interval = attr.ib(0.1)
     encoding = attr.ib(sys.getdefaultencoding())
-    name = attr.ib(None)
+    name = attr.ib(__name__)
 
     def __attrs_post_init__(self):
         self.name = self.fn.__module__ + '.' + self.fn.__qualname__
@@ -153,7 +169,7 @@ class RedisPubSubListener(object):
 @attr.s()
 class RedisPubSubUtil(object):
     file = attr.ib(None)
-    name = attr.ib(None)
+    name = attr.ib(__name__)
     config = attr.ib(None)
     instance = attr.ib(None)
     env = attr.ib(None)
@@ -191,3 +207,23 @@ class RedisPubSubUtil(object):
     def run(self):
         self.loop = asyncio.get_event_loop()
         self.loop.run_until_complete(asyncio.gather(*self.run_coroutines()))
+
+
+def run(options={}):
+    options = addict.Dict(options)
+    redis_pubsub_util = RedisPubSubUtil(**options.redis_pubsub_util)
+    [
+        redis_pubsub_util.subscribe()(getattr(
+            __import__(module_name), function_name)) for path in options.paths
+        for module_name, function_name in [path.split(':')]
+    ]
+    redis_pubsub_util.run()
+
+
+def main(argv=[]):  # type: int
+    fire.Fire()
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main(sys.argv))

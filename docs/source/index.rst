@@ -16,12 +16,27 @@ Example
 
     >>> import umuus_redis_pubsub_decorator
 
+
 ----
 
-    redis_pubsub_decorator = umuus_redis_pubsub_decorator.RedisPubSubUtil(
-      name=__name__,
-      file='tmp_redis.json'
-    )
+    $ cat CONFIG.json
+
+    {
+        "redis_pubsub_util": {
+            "config": {
+                "host": "redis",
+                "port": 6379,
+                "password": "ehu493jfqn8d"
+            }
+        },
+        "paths": ["example:foo", "example:bar"]
+    }
+
+    $ python umuus_redis_pubsub_decorator.py run --options "$(cat CONFIG.json)"
+
+----
+
+    redis_pubsub_decorator = umuus_redis_pubsub_decorator.RedisPubSubUtil(config={"host": "redis", "port": 6379})
 
     @redis_pubsub_decorator.publish()
     def f(x, y):
