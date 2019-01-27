@@ -162,7 +162,7 @@ class RedisPubSubListener(object):
     name = attr.ib(__name__)
 
     def __attrs_post_init__(self):
-        self.name = self.fn.__module__ + '.' + self.fn.__qualname__
+        self.name = self.fn.__module__ + ':' + self.fn.__qualname__
 
     def __call__(self, *args, **kwargs):
         return self.fn(*args, **kwargs)
@@ -219,7 +219,7 @@ class RedisPubSubUtil(object):
     def subscribe(self, fn):
         listener = RedisPubSubListener(fn=fn, parent=self)
         self.subscriptions.append(listener)
-        return self
+        return fn
 
     def run_coroutines(self):
         return list(map(lambda _: _.run(), self.subscriptions))
